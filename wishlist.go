@@ -24,7 +24,7 @@ type Wishlist struct {
 }
 
 var (
-	dataFile = "gs://capaccio-secret-santa-2025/wishlist.json"
+	dataFile = "https://storage.cloud.google.com/capaccio-secret-santa-2025/wishlist.json"
 	mutex    sync.Mutex
 )
 
