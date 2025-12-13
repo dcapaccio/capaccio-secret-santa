@@ -31,6 +31,7 @@ input {
     padding: 8px;
     border: 1px solid #ccc;
     outline: none;
+    font-size: clamp(1em, 2vw, 2em);
 }
 
 select {
@@ -38,11 +39,13 @@ select {
     padding: 8px;
     border: 1px solid #ccc;
     outline: none;
+    font-size: clamp(1rem, 3vw, 3rem);
 }
 
 button,
 .button,
 input[type="submit"] {
+    font-size: clamp(16px, 2vw, 24px);
     display: block;
     background-color: #222;
     color: #eee;
