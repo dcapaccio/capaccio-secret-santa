@@ -16,31 +16,31 @@ type Item struct {
 }
 
 type Wishlist struct {
-	ID        int     `json:"id"`
-	Name      string  `json:"name"`
-	Items     []Item  `json:"items"`
-	BuyingFor string  `json:"buyingFor,omitempty"`
-	Household string  `json:"household,omitempty"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Items     []Item `json:"items"`
+	BuyingFor string `json:"buyingFor,omitempty"`
+	Household string `json:"household,omitempty"`
 }
 
 var (
-	dataFile = "wishlist.json"
+	dataFile = "gs://capaccio-secret-santa-2025/wishlist.json"
 	mutex    sync.Mutex
 )
 
 // Predefined people with unique IDs
 var people = map[string]int{
-	"Ben":       1,
-	"Teresa":    2,
-	"Jen":       3,
-	"Chris":     4,
-	"Danny":     5,
-	"Marianna":  6,
-	"Alyse":     7,
-	"John":      8,
-	"Laura":     9,
-	"Vincent":   10,
-	"Joe":       11,
+	"Ben":      1,
+	"Teresa":   2,
+	"Jen":      3,
+	"Chris":    4,
+	"Danny":    5,
+	"Marianna": 6,
+	"Alyse":    7,
+	"John":     8,
+	"Laura":    9,
+	"Vincent":  10,
+	"Joe":      11,
 }
 
 // Load existing wishlists from file
@@ -153,11 +153,11 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 	wishlists, _ := loadWishlists()
 
 	tmplData := struct {
-		NameOptions []string;
-		Wishlist	[]Wishlist;
+		NameOptions []string
+		Wishlist    []Wishlist
 	}{
 		NameOptions: names,
-		Wishlist: wishlists,
+		Wishlist:    wishlists,
 	}
 
 	tmpl := templates.Lookup("form.html.tmpl")
@@ -232,8 +232,8 @@ func giftRecipientHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmplData := struct {
-		Recipient string;
-		Items	 []Item;
+		Recipient string
+		Items     []Item
 	}{
 		Recipient: recipientName,
 		Items:     recipientWishlist,
