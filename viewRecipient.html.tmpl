@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>You have {{.Recipient}} in the Capaccio 2025 Secret Santa!</title>
+    <link rel="stylesheet" type="text/css" href="static/styles.css">
+</head>
+
+<body>
+    <h1>Get Shopping for {{.Recipient}}</h1>
+    <h2>Here are some things they've requested.</h2>
+    <div>Remember, Keep the total spent to about $50.</div>
+    <ul>
+        {{range .Items}}
+        <li><b>{{.Name}}</b> ({{.Priority}}) {{if .Link}}- <a href="{{.Link}}" target="_blank">Link</a>{{end}}</li>
+        {{end}}
+    </ul>
+</body>
+
+</html>

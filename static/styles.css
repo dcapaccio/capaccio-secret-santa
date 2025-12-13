@@ -1,0 +1,135 @@
+*,
+*::before,
+*::after {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 20px;
+    height: 100vh;
+    color: #0e3720;
+    background: linear-gradient(135deg, #52eca4, #ff616e);
+}
+
+h1 {
+    color: #0e3720;
+}
+
+a {
+    color: #0e3602;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+input {
+    border-radius: 5px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+select {
+    border-radius: 5px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+button,
+.button,
+input[type="submit"] {
+    display: block;
+    background-color: #222;
+    color: #eee;
+    border-radius: 5px;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+input[type="submit"] {
+    width: 50%;
+}
+
+button:hover,
+button:focus,
+button:active {
+    background-color: #126940;
+    color: #b8c6be;
+}
+
+.instruct {
+    font-weight: bold;
+    margin: 1em 2em;
+    padding: 1em 0 1em 1em;
+    border-left: 3px solid #0e3720;
+    font-size: .8em;
+}
+
+.labelTop {
+    display: block;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: .9em;
+}
+
+.labeledInput {
+    display: block;
+    width: 50%;
+}
+
+section {
+    border-radius: 15px;
+    background-color: #ffffffc9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1em;
+    margin: 2em 0;
+}
+
+.title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.items {
+    margin: 0;
+    display: flex;
+    gap: 15px 5px;
+    flex-direction: column;
+}
+
+.item {
+    display: flex;
+    gap: 5px;
+    padding: 5px;
+    flex-wrap: wrap;
+}
+
+.item:nth-child(odd) {
+    background-color: #e4454590;
+}
+
+.existing {
+    font-style: italic;
+    display: block;
+}
+
+.current {
+    margin: 0 2em;
+
+}
+
+.current>a {
+    text-decoration: none;
+    background-color: #25ae51;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    font-size: .8em;
+}

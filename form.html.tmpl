@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Capaccio Secret Santa | Add to Wishlist</title>
+    <link rel="stylesheet" type="text/css" href="static/styles.css" />
+  </head>
+
+  <body>
+    <h1>Capaccio Secret Santa 2025!</h1>
+    <div class="current">
+      <a class="button" href="/view">View All Current Wishlists!</a>
+    </div>
+    <div class="instruct">
+      First, pick your name from the dropdown. Then add items. Tap Submit when
+      you're done.
+    </div>
+    <form action="/submit" method="post">
+      <label class="labelTop" for="name">Your Name</label>
+      <select
+        class="labeledInput"
+        id="name"
+        name="name"
+        aria-placeholder=""
+        onchange="updateList({{ .Wishlist}})"
+      >
+        {{
+          range.NameOptions
+        }}
+        <option value="{{.}}">{{.}}</option>
+        {{
+          end
+        }}
+      </select>
+      <section>
+        <div class="title">Your List</div>
+        <div id="items" class="items">
+          <div class="item">
+            <input type="text" name="itemName" placeholder="Item Name" />
+            <select name="priority">
+              <option value="High">Really Want</option>
+              <option value="Medium">Want</option>
+              <option value="Low">Kinda Want</option>
+            </select>
+            <input type="text" name="link" placeholder="Link (optional)" />
+          </div>
+        </div>
+        <button type="button" onclick="addItem()">Add Another Item?</button>
+      </section>
+      <input type="submit" value="Submit" />
+    </form>
+    <div>
+      If there are issues with this form, send your list directly to
+      <a href="mailto:d.capaccio@gmail.com">d.capaccio@gmail.com</a>
+    </div>
+
+    <script>
+      function addItem() {
+        const itemsDiv = document.getElementById("items");
+        const newItem = document.createElement("div");
+        newItem.className = "item";
+        newItem.innerHTML = `
+                <input type="text" name="itemName" placeholder="Item Name">
+                <select name="priority">
+                    <option value="High">Really Want</option>
+                    <option value="Medium">Want</option>
+                    <option value="Low">Kinda Want</option>
+                </select>
+                <input type="text" name="link" placeholder="Link (optional)">
+            `;
+        itemsDiv.appendChild(newItem);
+      }
+
+      function updateList(ws) {
+        // find wishlist for selected name
+        for (const w of ws) {
+          if (w.name === document.getElementById("name").value) {
+            renderItems(w.items);
+            return;
+          }
+        }
+      }
+
+      function renderItems(items) {
+        const itemsDiv = document.getElementById("items");
+        itemsDiv.innerHTML = "";
+        for (const item of items) {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "existing";
+          itemDiv.innerHTML = `${item.name} - (${item.priority}) - ${
+            item.link
+              ? '- <a href="' + item.link + '" target="_blank">Link</a>'
+              : ""
+          }`;
+          itemsDiv.appendChild(itemDiv);
+        }
+      }
+    </script>
+  </body>
+</html>

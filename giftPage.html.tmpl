@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Capaccio Secret Santa | Find out who you have!</title>
+    <link rel="stylesheet" type="text/css" href="static/styles.css">
+</head>
+
+<body>
+    <h1>Find out who you have!</h1>
+    <form action="/giftRecipient" method="get">
+        <label for="name">Pick YOUR Name</label>
+        <select id="name" name="name">
+            {{range .NameOptions}}
+                <option value="{{.}}">{{.}}</option>
+            {{end}}
+        </select>
+        <input type="submit" value="See who you are buying for!">
+    </form>
+</body>
+
+</html>

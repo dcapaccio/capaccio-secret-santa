@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Capaccio Secret Santa | View All Wishlists</title>
+    <link rel="stylesheet" type="text/css" href="static/styles.css" />
+  </head>
+  <body>
+    <h1>Wishlists</h1>
+    {{range .}}
+    <section class="card">
+      <h2>{{.Name}} wants</h2>
+      {{if not .Items}}
+      <div>No items listed.</div>
+      {{ end }}
+      <!-- if len items end-->
+      <ul>
+        {{
+          range.Items
+        }}
+        <li>
+          <b>{{.Name}}</b> ({{.Priority}}) {{if .Link}}-
+          <a href="{{.Link}}" target="_blank">Link</a>{{ end }}
+        </li>
+        {{
+          end
+        }}
+      </ul>
+    </section>
+    {{ end }}
+    <!-- range end-->
+  </body>
+</html>
