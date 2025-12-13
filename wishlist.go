@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
-	"os"
 	"sync"
+
+	"cloud.google.com/go/storage"
 )
 
 type Item struct {
@@ -23,9 +26,12 @@ type Wishlist struct {
 	Household string `json:"household,omitempty"`
 }
 
+// "Global" vars -- should be in a daemon context or... well for now this is fine.
 var (
-	dataFile = "https://storage.cloud.google.com/capaccio-secret-santa-2025/wishlist.json"
-	mutex    sync.Mutex
+	// dataFile = "https://storage.cloud.google.com/capaccio-secret-santa-2025/wishlist.json"
+	mutex      sync.Mutex
+	bucketName = "capaccio-secret-santa-2025"
+	blobName   = "wishlist.json"
 )
 
 // Predefined people with unique IDs
@@ -43,36 +49,157 @@ var people = map[string]int{
 	"Joe":      11,
 }
 
+//  Example code, left in here for reference until stable.
+// // MyCloudRunHandler Example is an http handler to call a update json function
+// func MyCloudRunHandler(w http.ResponseWriter, r *http.Request) {
+
+// 	// Example data to merge/update
+// 	newUpdates := map[string]interface{}{
+// 		"key_to_update":  "new_value_from_golang",
+// 		"another_key_go": 456,
+// 	}
+
+// 	err := updateJSONInBucket(r.Context(), bucketName, blobName, newUpdates)
+// 	if err != nil {
+// 		log.Printf("Error updating JSON: %v", err)
+// 		http.Error(w, fmt.Sprintf("Failed to update JSON: %v", err), http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	fmt.Fprintf(w, "JSON object %s in bucket %s updated successfully.\n", blobName, bucketName)
+// }
+
+// // updateJSONInBucket reads, updates, and writes a JSON file in a GCS bucket.
+// func updateJSONInBucket(ctx context.Context, bucketName, blobName string, updates map[string]interface{}) error {
+// 	client, err := storage.NewClient(ctx)
+// 	if err != nil {
+// 		return fmt.Errorf("storage.NewClient: %w", err)
+// 	}
+// 	defer client.Close()
+
+// 	bucket := client.Bucket(bucketName)
+// 	obj := bucket.Object(blobName)
+
+// 	// 1. Read existing JSON (if applicable)
+// 	// Create a reader to download the object
+// 	rc, err := obj.NewReader(ctx)
+// 	if err != nil {
+// 		// If the file doesn't exist, we'll start with an empty map.
+// 		// Handle other errors as actual failures.
+// 		if err == storage.ErrObjectNotExist {
+// 			log.Printf("Object %s does not exist, creating new.", blobName)
+// 		} else {
+// 			return fmt.Errorf("obj.NewReader: %w", err)
+// 		}
+// 	}
+// 	defer rc.Close()
+
+// 	var existingData map[string]interface{}
+// 	if err == nil { // Only read if NewReader succeeded
+// 		byteValue, err := ioutil.ReadAll(rc)
+// 		if err != nil {
+// 			return fmt.Errorf("ioutil.ReadAll: %w", err)
+// 		}
+// 		if len(byteValue) > 0 {
+// 			if err := json.Unmarshal(byteValue, &existingData); err != nil {
+// 				return fmt.Errorf("json.Unmarshal existing data: %w", err)
+// 			}
+// 		}
+// 	}
+
+// 	if existingData == nil {
+// 		existingData = make(map[string]interface{})
+// 	}
+
+// 	// 2. Modify the JSON data
+// 	for k, v := range updates {
+// 		existingData[k] = v
+// 	}
+
+// 	// 3. Serialize the updated JSON
+// 	updatedJSON, err := json.MarshalIndent(existingData, "", "  ") // Use MarshalIndent for pretty printing
+// 	if err != nil {
+// 		return fmt.Errorf("json.MarshalIndent: %w", err)
+// 	}
+
+// 	// 4. Upload the updated JSON
+// 	wc := obj.NewWriter(ctx)
+// 	wc.ContentType = "application/json"
+// 	if _, err := wc.Write(updatedJSON); err != nil {
+// 		return fmt.Errorf("wc.Write: %w", err)
+// 	}
+// 	if err := wc.Close(); err != nil {
+// 		return fmt.Errorf("wc.Close: %w", err)
+// 	}
+
+// 	return nil
+// }
+
 // Load existing wishlists from file
-func loadWishlists() ([]Wishlist, error) {
-	file, err := os.Open(dataFile)
+func loadWishlists(ctx context.Context) ([]Wishlist, error) {
+
+	client, err := storage.NewClient(ctx)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return []Wishlist{}, nil
-		}
-		return nil, err
+		return []Wishlist{}, fmt.Errorf("storage.NewClient: %w", err)
 	}
-	defer file.Close()
+	defer client.Close()
+
+	bucket := client.Bucket(bucketName)
+	obj := bucket.Object(blobName)
+
+	// 1. Read existing JSON (if applicable)
+	// Create a reader to download the object
+	rc, err := obj.NewReader(ctx)
+	if err != nil {
+		// If the file doesn't exist, we'll start with an empty map.
+		// Handle other errors as actual failures.
+		if err == storage.ErrObjectNotExist {
+			log.Printf("Object %s does not exist, creating new.", blobName)
+		} else {
+			return []Wishlist{}, fmt.Errorf("obj.NewReader: %w", err)
+		}
+	}
+	defer rc.Close()
 
 	var wishlists []Wishlist
-	err = json.NewDecoder(file).Decode(&wishlists)
-	if err != nil {
-		return []Wishlist{}, nil
+	if err == nil { // Only read if NewReader succeeded
+		err = json.NewDecoder(rc).Decode(&wishlists)
+		if err != nil {
+			return []Wishlist{}, fmt.Errorf("json.NewDecoder.Decode existing data: %w", err)
+		}
 	}
 	return wishlists, nil
 }
 
-// Save wishlists to file
-func saveWishlists(wishlists []Wishlist) error {
-	file, err := os.Create(dataFile)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+// Save wishlists to gcs storage as json file.
+func saveWishlists(ctx context.Context, wishlists []Wishlist) error {
 
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(wishlists)
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("storage.NewClient: %w", err)
+	}
+	defer client.Close()
+
+	bucket := client.Bucket(bucketName)
+	obj := bucket.Object(blobName)
+
+	// 3. Serialize the updated JSON
+	updatedJSON, err := json.MarshalIndent(wishlists, "", "  ") // Use MarshalIndent for pretty printing
+	if err != nil {
+		return fmt.Errorf("json.MarshalIndent: %w", err)
+	}
+
+	// 4. Upload the updated JSON
+	wc := obj.NewWriter(ctx)
+	wc.ContentType = "application/json"
+	if _, err := wc.Write(updatedJSON); err != nil {
+		return fmt.Errorf("wc.Write: %w", err)
+	}
+	if err := wc.Close(); err != nil {
+		return fmt.Errorf("wc.Close: %w", err)
+	}
+
+	return nil
 }
 
 // Handle form submission
@@ -118,7 +245,7 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	wishlists, _ := loadWishlists()
+	wishlists, _ := loadWishlists(r.Context())
 
 	// Check if person's name exists
 	found := false
@@ -134,7 +261,7 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 		wishlists = append(wishlists, Wishlist{ID: id, Name: name, Items: items})
 	}
 
-	saveWishlists(wishlists)
+	saveWishlists(r.Context(), wishlists)
 
 	http.Redirect(w, r, "/view", http.StatusSeeOther)
 }
@@ -150,7 +277,7 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		names = append(names, name)
 	}
 
-	wishlists, _ := loadWishlists()
+	wishlists, _ := loadWishlists(r.Context())
 
 	tmplData := struct {
 		NameOptions []string
@@ -166,22 +293,15 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 
 // Render wishlists
 func viewHandler(w http.ResponseWriter, r *http.Request) {
-	wishlists, _ := loadWishlists()
+	wishlists, _ := loadWishlists(r.Context())
 
 	tmpl := templates.Lookup("view.html.tmpl")
 	tmpl.Execute(w, wishlists)
 }
 
-// API endpoint: return JSON
-func apiHandler(w http.ResponseWriter, r *http.Request) {
-	wishlists, _ := loadWishlists()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(wishlists)
-}
-
 // get who you have page
 func giftPageHandler(w http.ResponseWriter, r *http.Request) {
-	wishlists, _ := loadWishlists()
+	wishlists, _ := loadWishlists(r.Context())
 
 	// Build dropdown options dynamically
 	var names []string
@@ -207,7 +327,7 @@ func giftRecipientHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wishlists, _ := loadWishlists()
+	wishlists, _ := loadWishlists(r.Context())
 	var recipientName string
 	var recipientWishlist []Item
 
@@ -247,7 +367,6 @@ func main() {
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/submit", submitHandler)
 	http.HandleFunc("/view", viewHandler)
-	http.HandleFunc("/api/wishlists", apiHandler)
 	http.HandleFunc("/gift", giftPageHandler)
 	http.HandleFunc("/giftRecipient", giftRecipientHandler)
 	// To serve CSS static files
