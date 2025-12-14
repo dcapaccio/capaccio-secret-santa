@@ -6,6 +6,29 @@
     box-sizing: border-box;
 }
 
+/* Fluid typography using clamp() */
+h1 {
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  /* Minimum: 30px, Preferred: 4vw, Maximum: 48px */
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  /* Minimum: 24px, Preferred: 3vw, Maximum: 36px */
+}
+
+/* Fluid spacing */
+.section {
+  padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
+}
+
+/* Combined with media queries for fine control */
+@media (min-width: 768px) {
+  .section {
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem);
+  }
+}
+
 body {
     font-family: Helvetica, Arial, sans-serif;
     margin: 20px;
@@ -16,7 +39,6 @@ body {
 
 h1 {
     color: #0e3720;
-    font-size: 1.4em;
 }
 
 a {
