@@ -24,6 +24,7 @@
         aria-placeholder=""
         onchange="updateList({{ .Wishlist}})"
       >
+      <option disabled selected value> -- select name -- </option>
         {{
           range.NameOptions
         }}
@@ -47,6 +48,7 @@
         </div>
         <button type="button" onclick="addItem()">Add Another Item?</button>
       </section>
+      <div class="instruct">When all done, type submit. You can add more items later.</div>
       <input type="submit" value="Submit" />
     </form>
     <div>
