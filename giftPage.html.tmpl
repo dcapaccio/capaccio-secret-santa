@@ -10,8 +10,9 @@
 <body>
     <h1>Find out who you have!</h1>
     <form action="/giftRecipient" method="get">
-        <label for="name">Pick YOUR Name</label>
-        <select id="name" name="name">
+        <label class="labelTop" for="name">Pick YOUR Name</label>
+        <select class="labeledInput" id="name" name="name">
+            <option disabled selected value> -- your name -- </option>
             {{range .NameOptions}}
                 <option value="{{.}}">{{.}}</option>
             {{end}}
