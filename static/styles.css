@@ -31,7 +31,7 @@ h2 {
 
 body {
     font-family: Helvetica, Arial, sans-serif;
-    margin: 20px;
+    margin: 1.5em;
     height: 100vh;
     color: #0e3720;
     background: linear-gradient(135deg, #52eca4, #ff616e);
@@ -50,17 +50,17 @@ a {
 }
 
 input {
-    border-radius: 5px;
-    padding: 8px;
-    border: 1px solid #ccc;
+    border-radius: .4em;
+    padding: .8em;
+    border: 2px solid #ccc;
     outline: none;
     font-size: clamp(2em, 2vw, 3em);
 }
 
 select {
-    border-radius: 5px;
-    padding: 8px;
-    border: 1px solid #ccc;
+    border-radius: .4em;
+    padding: .8em;
+    border: 2px solid #ccc;
     outline: none;
     font-size: clamp(3rem, 3vw, 3rem);
 }
@@ -72,8 +72,8 @@ input[type="submit"] {
     display: block;
     background-color: #222;
     color: #eee;
-    border-radius: 5px;
-    padding: 10px 15px;
+    border-radius: .4em;
+    padding: .9em 1em;
     border: none;
     cursor: pointer;
     outline: none;
@@ -100,7 +100,7 @@ button:active {
 
 .labelTop {
     display: block;
-    margin-bottom: 3px;
+    margin-bottom: .1em;
     text-transform: uppercase;
     font-weight: bold;
     font-size: .9em;
@@ -112,9 +112,9 @@ button:active {
 }
 
 section {
-    border-radius: 15px;
+    border-radius: 1em;
     background-color: #ffffffc9;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 .2em .5em rgba(0, 0, 0, 0.1);
     padding: 1em;
     margin: 2em 0;
 }
@@ -134,13 +134,13 @@ section {
 
 .item {
     display: flex;
-    gap: 5px;
-    padding: 5px;
+    gap: .3em;
+    padding: .3em;
     flex-wrap: wrap;
 }
 
 .item:nth-child(odd) {
-    background-color: #e4454590;
+    background-color: #56454590;
 }
 
 .existing {
